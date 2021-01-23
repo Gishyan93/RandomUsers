@@ -53,6 +53,8 @@ final class RandomUsersView: NiblessView {
             forCellWithReuseIdentifier: cellID)
         collectionView.register(RandomUserLoadingFooter.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: footerID)
         
+        collectionView.keyboardDismissMode = .onDrag
+        collectionView.showsVerticalScrollIndicator = true
         collectionView.alwaysBounceVertical = true
         collectionView.backgroundColor = .appUltraLightGray
         return collectionView
