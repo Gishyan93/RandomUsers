@@ -61,7 +61,8 @@ final class SavedUsersView: NiblessView {
         collectionView.register(
             SavedUserCell.self,
             forCellWithReuseIdentifier: cellID)
-        
+        collectionView.keyboardDismissMode = .onDrag
+        collectionView.showsVerticalScrollIndicator = true
         collectionView.alwaysBounceVertical = true
         collectionView.backgroundColor = .appUltraLightGray
         return collectionView
