@@ -20,6 +20,7 @@ class RandomUserLoadingFooter: UICollectionReusableView {
             label.text = "Loading..."
             label.font = .systemFont(ofSize: 16)
             label.textAlignment = .center
+            label.textColor = .black
             return label
         }()
         
