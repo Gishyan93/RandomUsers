@@ -5,7 +5,7 @@
 
 import Foundation
 
-public protocol NotSignedInResponder {
+public protocol OnBoardingResponder {
   
-  func notSignedIn()
+  func onBoarding()
 }

@@ -31,7 +31,7 @@ final class RandomUsersView: NiblessView {
     
     private lazy var flowLayout: UICollectionViewFlowLayout = {
         let flowLayout = UICollectionViewFlowLayout()
-        flowLayout.minimumLineSpacing = 10
+        flowLayout.minimumLineSpacing = 0
         flowLayout.scrollDirection = .vertical
         flowLayout.sectionInset = UIEdgeInsets(
             top: verticalInset,
@@ -126,12 +126,11 @@ final class RandomUsersView: NiblessView {
         
         
         searchBar
-            .rx.text // Observable property
-            .orEmpty // Make it non-optional
-            .debounce(.milliseconds(500), scheduler: MainScheduler.instance) // Wait 0.5 for changes.
-            .distinctUntilChanged() // If they didn't occur, check if the new value is the same as old.
-            //.filter { !$0.isEmpty } // If the new value is really new, filter for non-empty query.
-            .subscribe(onNext: { [unowned self] query in // Here we subscribe to every new value, that is not empty (thanks to filter above).
+            .rx.text
+            .orEmpty
+            .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
+            .distinctUntilChanged()
+            .subscribe(onNext: { [unowned self] query in
                 
                 if query.count < 2 {
                     self.shownUsers = self.allUsers
@@ -169,7 +168,7 @@ final class RandomUsersView: NiblessView {
     
     private func setupCollectionView() {
         addSubview(collectionView)
-        collectionView.anchor(top: separatorLine.bottomAnchor, leading: leadingAnchor, bottom: bottomAnchor, trailing: trailingAnchor)
+        collectionView.anchor(top: separatorLine.bottomAnchor, leading: leadingAnchor, bottom: bottomAnchor, trailing: trailingAnchor, padding: .init(top: 8, left: 0, bottom: 0, right: 0))
     }
     
 }
@@ -204,16 +203,8 @@ extension RandomUsersView: UICollectionViewDataSource {
 extension RandomUsersView: UICollectionViewDelegateFlowLayout {
     //sizeForItemAt
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        
-        let dummyCell = RandomUserCell(frame: .init(x: 0, y: 0, width: bounds.width, height: 1000))
-        
-        dummyCell.randomUser = self.shownUsers[indexPath.item]
-        dummyCell.layoutIfNeeded()
-        
-        let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: bounds.width, height: 1000))
-        
-        return .init(width: UIScreen.main.bounds.width, height: estimatedSize.height)
-        
+
+        return .init(width: UIScreen.main.bounds.width, height: 110)
         
     }
     

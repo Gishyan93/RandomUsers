@@ -58,5 +58,4 @@ public class UserProfileViewController: NiblessViewController {
     private func setupNavigatioBar() {
         self.navigationController?.navigationBar.topItem?.title = "Users"
     }
-    
 }

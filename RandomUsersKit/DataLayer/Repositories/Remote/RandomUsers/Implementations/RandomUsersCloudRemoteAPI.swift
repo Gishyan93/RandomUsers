@@ -9,16 +9,15 @@ import PromiseKit
 public class RandomUsersCloudRemoteAPI: RandomUsersRemoteAPI {
     
     // MARK: - Properties
-    let userSession: RemoteUserSession
     let urlSession: URLSession
     let domain = "randomuser.me"
     
     // MARK: - Methods
-    public init(userSession: RemoteUserSession) {
-        self.userSession = userSession
+    public init() {
         
         let config = URLSessionConfiguration.default
-        config.httpAdditionalHeaders = ["Authorization": "Bearer \(userSession.token)"]
+        
+        config.httpAdditionalHeaders = ["Authorization": "Bearer"]
         self.urlSession = URLSession(configuration: config)
     }
     

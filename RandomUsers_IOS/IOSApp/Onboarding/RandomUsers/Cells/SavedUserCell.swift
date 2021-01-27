@@ -41,6 +41,8 @@ class SavedUserCell : BaseCell {
         }
     }
     
+    var horizontalStackView = UIStackView()
+    
     private let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
@@ -84,7 +86,6 @@ class SavedUserCell : BaseCell {
         return address
     }()
     
-    private let cheapLevelLabel = UILabel(text: "", textColor: .black, textAlignment: .right, font: .systemFont(ofSize: 14), numberOfLines: 0)
     private let separatorView = UIView.createSeparatorView(withColor: .appLightGray)
 
     //
@@ -93,27 +94,40 @@ class SavedUserCell : BaseCell {
     override func setupViews()  {
         super.setupViews()
         
-        setupStackView()
+        //setupStackView()
+        constructStackView()
+        constructHierarchy()
+        activateConstraints()
     }
     
     
-    
-    private func setupStackView() {
-        
-        
-        let verticalStackView = VerticalStackView(arrangedSubviews: [userNamelabel,userInfoLabel,countryLabel,addressLabel], spacing: 8)
+    func constructStackView() {
+        let imageStackView = VerticalStackView(arrangedSubviews: [UIView(),imageView,UIView()])
+
+        let verticalStackView = VerticalStackView(arrangedSubviews: [userNamelabel,userInfoLabel,countryLabel,addressLabel], spacing: 4)
         verticalStackView.distribution = .fillEqually
-                
-        let horizontalMiddleStackView = HorizontalStackView(arrangedSubviews: [imageView,verticalStackView], spacing: 4)
-        
-        
-        let horizontalDownStackView = HorizontalStackView(arrangedSubviews: [UIView(), cheapLevelLabel], spacing: 8)
-        
-        
-        let stackView = VerticalStackView(arrangedSubviews: [horizontalMiddleStackView,horizontalDownStackView,separatorView.setHeight(1)], spacing: 8)
-        
-        addSubview(stackView)
-        stackView.fillSuperview(padding: .init(top: 8, left: 16, bottom: 0, right: 16))
+
+        horizontalStackView = HorizontalStackView(arrangedSubviews: [imageStackView,verticalStackView], spacing: 4)
+    }
+    
+    func constructHierarchy() {
+        addSubview(horizontalStackView)
+        addSubview(separatorView)
+    }
+    
+    func activateConstraints() {
+        activateConstraintsHorizontalStackView()
+        activateConstraintsSeparatorView()
+    }
+    
+    func activateConstraintsHorizontalStackView() {
+
+        horizontalStackView.anchor(top: nil, leading: leadingAnchor, bottom: bottomAnchor, trailing: nil,padding: .init(top: 0, left: 16, bottom: 16, right: 16))
+    }
+    
+    func activateConstraintsSeparatorView() {
+        separatorView.setHeight(1)
+        separatorView.anchor(top: horizontalStackView.bottomAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor,padding: .init(top: 8, left: 16, bottom: 0, right: 16))
     }
 }
 

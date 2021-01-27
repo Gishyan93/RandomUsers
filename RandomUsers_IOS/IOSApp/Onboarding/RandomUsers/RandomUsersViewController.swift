@@ -14,8 +14,8 @@ public class RandomUsersViewController: NiblessViewController {
     
     let randomUsersView: RandomUsersView
     let savedUsersView: SavedUsersView
+    
     // Child Views
-
     private lazy var segmentedControl: UISegmentedControl = {
         let items = ["Users", "Saved Users"]
         let control = UISegmentedControl(items: items)
@@ -31,7 +31,6 @@ public class RandomUsersViewController: NiblessViewController {
     
     // MARK: - Methods
     init(viewModel: RandomUsersViewModel) {
-        //self.randomUsersViewModelFactory = randomUsersViewModelFactory
         self.viewModel = viewModel
         self.randomUsersView = RandomUsersView(viewModel: viewModel)
         self.savedUsersView = SavedUsersView(viewModel: viewModel)

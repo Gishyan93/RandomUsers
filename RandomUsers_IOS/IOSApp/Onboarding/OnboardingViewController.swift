@@ -75,7 +75,6 @@ public class OnboardingViewController: NiblessNavigationController {
         pushViewController(randomUserViewController, animated: false)
     }
     
-    
     func presentUserPage() {
         pushViewController(userProfileViewController, animated: true)
     }

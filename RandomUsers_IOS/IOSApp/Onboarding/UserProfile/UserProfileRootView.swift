@@ -211,7 +211,7 @@ private var saveUserButton: UIButton = {
     
     private func activateConstraintsMapView() {
         mapView.setHeight(200)
-        mapView.anchor(top: topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor)
+        mapView.anchor(top: safeAreaLayoutGuide.topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor)
     }
     
     private func activateConstraintsImageView() {

@@ -9,13 +9,10 @@ public class RandomUsersOnboardingDependencyContainer {
     
     // MARK: - Properties
     
-    // From parent container
-    let sharedMainViewModel: MainViewModel
-    
     // Long-lived dependencies
     let sharedOnboardingViewModel: OnboardingViewModel
     let groupsRemoteApi: RandomUsersRemoteAPI
-    let fgroupsRepository: RandomUsersRepository
+    let ramdomUsersRepository: RandomUsersRepository
     
     let randomUsersViewModel: RandomUsersViewModel
     let userProfileViewModel: UserProfileViewModel
@@ -27,26 +24,28 @@ public class RandomUsersOnboardingDependencyContainer {
             return OnboardingViewModel()
         }
         
-        func getFgroupsRemoteAPI() -> RandomUsersRemoteAPI {
-            return RandomUsersCloudRemoteAPI(userSession: RemoteUserSession(token: ""))
+        func randomUsersRemoteAPI() -> RandomUsersRemoteAPI {
+            return RandomUsersCloudRemoteAPI()
         }
         
-        func fgroupsRepository(fgroupsRemoteAPI: RandomUsersRemoteAPI) -> RandomUsersRepository {
-            let fgroupsRemoteAPI = getFgroupsRemoteAPI()
+        func randomUsersRepository(fgroupsRemoteAPI: RandomUsersRemoteAPI) -> RandomUsersRepository {
+            let fgroupsRemoteAPI = randomUsersRemoteAPI()
             return RandomUsersAppRepository(remoteAPI: fgroupsRemoteAPI)
         }
-
-        self.sharedMainViewModel = appDependencyContainer.sharedMainViewModel
         
         self.sharedOnboardingViewModel = makeOnboardingViewModel()
-        self.groupsRemoteApi = getFgroupsRemoteAPI()
-        self.fgroupsRepository = fgroupsRepository(fgroupsRemoteAPI: self.groupsRemoteApi)
+        self.groupsRemoteApi = randomUsersRemoteAPI()
+        self.ramdomUsersRepository = randomUsersRepository(
+            fgroupsRemoteAPI: self.groupsRemoteApi)
         
-        self.randomUsersViewModel = RandomUsersViewModel(repository: self.fgroupsRepository,
-                                                         selectUserResponder: sharedOnboardingViewModel)
-        self.userProfileViewModel = UserProfileViewModel(repository: self.fgroupsRepository,
-                                                         savingUserResponder: randomUsersViewModel)
-        self.userProfileViewController = UserProfileViewController(viewModel: userProfileViewModel)
+        self.randomUsersViewModel = RandomUsersViewModel(
+            repository: self.ramdomUsersRepository,
+            selectUserResponder: sharedOnboardingViewModel)
+        self.userProfileViewModel = UserProfileViewModel(
+            repository: self.ramdomUsersRepository,
+            savingUserResponder: randomUsersViewModel)
+        self.userProfileViewController = UserProfileViewController(
+            viewModel: userProfileViewModel)
     }
     
     // Factories needed to create an OnboardingViewController.

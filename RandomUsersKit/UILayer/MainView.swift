@@ -11,18 +11,18 @@ public enum MainView {
   case onboarding
 }
 
-extension MainView: Equatable {
-  
-  public static func ==(lhs: MainView, rhs: MainView) -> Bool {
-    switch (lhs, rhs) {
-    case (.launching, .launching):
-      return true
-    case (.onboarding, .onboarding):
-      return true
-    case (.launching, _),
-         (.onboarding, _):
-      return false
-    }
-  }
-}
+//extension MainView: Equatable {
+//  
+//  public static func ==(lhs: MainView, rhs: MainView) -> Bool {
+//    switch (lhs, rhs) {
+//    case (.launching, .launching):
+//      return true
+//    case (.onboarding, .onboarding):
+//      return true
+//    case (.launching, _),
+//         (.onboarding, _):
+//      return false
+//    }
+//  }
+//}
 

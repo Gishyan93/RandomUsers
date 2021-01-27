@@ -41,7 +41,7 @@ final class SavedUsersView: NiblessView {
     
     private lazy var flowLayout: UICollectionViewFlowLayout = {
         let flowLayout = UICollectionViewFlowLayout()
-        flowLayout.minimumLineSpacing = 10
+        flowLayout.minimumLineSpacing = 0
         flowLayout.scrollDirection = .vertical
         flowLayout.sectionInset = UIEdgeInsets(
             top: verticalInset,
@@ -205,7 +205,7 @@ final class SavedUsersView: NiblessView {
     
     private func setupCollectionView() {
         addSubview(collectionView)
-        collectionView.anchor(top: separatorLine.bottomAnchor, leading: leadingAnchor, bottom: bottomAnchor, trailing: trailingAnchor)
+        collectionView.anchor(top: separatorLine.bottomAnchor, leading: leadingAnchor, bottom: bottomAnchor, trailing: trailingAnchor,padding: .init(top: 8, left: 0, bottom: 0, right: 0))
     }
     
 }
@@ -234,15 +234,9 @@ extension SavedUsersView: UICollectionViewDataSource {
 extension SavedUsersView: UICollectionViewDelegateFlowLayout {
     //sizeForItemAt
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+       
         
-        let dummyCell = SavedUserCell(frame: .init(x: 0, y: 0, width: bounds.width, height: 1000))
-        
-        dummyCell.randomUser = self.shownUsers[indexPath.item]
-        dummyCell.layoutIfNeeded()
-        
-        let estimatedSize = dummyCell.systemLayoutSizeFitting(.init(width: bounds.width, height: 1000))
-        
-        return .init(width: UIScreen.main.bounds.width, height: estimatedSize.height)
+        return .init(width: UIScreen.main.bounds.width, height: 110)
         
     }
 }

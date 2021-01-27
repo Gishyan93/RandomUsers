@@ -8,7 +8,6 @@ public class UserSession: Codable {
 
   // MARK: - Properties
   
-    //public let profile: UserProfile
     public let error: String
     public let message: String
     public let remoteSession: RemoteUserSession
@@ -26,7 +25,6 @@ public class UserSession: Codable {
 extension UserSession: Equatable {
   
   public static func ==(lhs: UserSession, rhs: UserSession) -> Bool {
-    //return lhs.profile == rhs.profile &&
      return lhs.remoteSession == rhs.remoteSession
   }
 }
