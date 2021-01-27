@@ -98,6 +98,7 @@ public class UserProfileViewModel {
             }
         }
         
+        PersistanceService.saveContext()
         savingUserResponder.removeUser()
        
         
