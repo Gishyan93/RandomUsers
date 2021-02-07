@@ -15,7 +15,7 @@ public class OnboardingViewController: NiblessNavigationController {
     let disposeBag = DisposeBag()
     
     // Child View Controllers
-    let randomUserViewController: RandomUsersViewController
+    let randomUsersViewController: RandomUsersViewController
     let userProfileViewController: UserProfileViewController
     
     // MARK: - Methods
@@ -23,7 +23,7 @@ public class OnboardingViewController: NiblessNavigationController {
          randomUserViewController: RandomUsersViewController,
          userProfileViewController: UserProfileViewController) {
         self.viewModel = viewModel
-        self.randomUserViewController = randomUserViewController
+        self.randomUsersViewController = randomUserViewController
         self.userProfileViewController = userProfileViewController
         super.init()
         self.delegate = self
@@ -65,59 +65,23 @@ public class OnboardingViewController: NiblessNavigationController {
     func present(view: OnboardingView) {
         switch view {
         case .randomuser:
-            presentWelcome()
+            presentRandomUsers()
         case .userpage:
             presentUserPage()
         }
     }
     
-    func presentWelcome() {
-        pushViewController(randomUserViewController, animated: false)
+    func presentRandomUsers() {
+        pushViewController(randomUsersViewController, animated: false)
     }
     
     func presentUserPage() {
         pushViewController(userProfileViewController, animated: true)
     }
-    
-}
-
-// MARK: - Navigation Bar Presentation
-extension OnboardingViewController {
-    
-    func hideOrShowNavigationBarIfNeeded(for view: OnboardingView, animated: Bool) {
-        if view.hidesNavigationBar() {
-            hideNavigationBar(animated: animated)
-        } else {
-            showNavigationBar(animated: animated)
-        }
-    }
-    
-    func hideNavigationBar(animated: Bool) {
-        if animated {
-            transitionCoordinator?.animate(alongsideTransition: { context in
-                self.setNavigationBarHidden(true, animated: animated)
-            })
-        } else {
-            setNavigationBarHidden(true, animated: false)
-        }
-    }
-    
-    func showNavigationBar(animated: Bool) {
-        if self.isNavigationBarHidden {
-            self.setNavigationBarHidden(false, animated: animated)
-        }
-    }
 }
 
 // MARK: - UINavigationControllerDelegate
 extension OnboardingViewController: UINavigationControllerDelegate {
-    
-    public func navigationController(_ navigationController: UINavigationController,
-                                     willShow viewController: UIViewController,
-                                     animated: Bool) {
-        guard let viewToBeShown = onboardingView(associatedWith: viewController) else { return }
-        hideOrShowNavigationBarIfNeeded(for: viewToBeShown, animated: animated)
-    }
     
     public func navigationController(_ navigationController: UINavigationController,
                                      didShow viewController: UIViewController,

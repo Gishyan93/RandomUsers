@@ -7,8 +7,9 @@ import UIKit
 import RxSwift
 
 public class RandomUsersViewController: NiblessViewController {
-    
+    //
     // MARK: - Properties
+    //
     let disposeBag = DisposeBag()
     let viewModel: RandomUsersViewModel
     
@@ -28,8 +29,9 @@ public class RandomUsersViewController: NiblessViewController {
         control.addTarget(self, action: #selector(indexChanged), for: .allEvents)
         return control
     }()
-    
+    //
     // MARK: - Methods
+    //
     init(viewModel: RandomUsersViewModel) {
         self.viewModel = viewModel
         self.randomUsersView = RandomUsersView(viewModel: viewModel)

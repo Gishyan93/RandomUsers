@@ -27,8 +27,6 @@ final class SavedUsersView: NiblessView {
     }
     var removedUsersRelay = BehaviorRelay(value: [Person]())
     
-   
-    
     var shownUsers = [Person]()
     var allUsers = [Person]()
     
@@ -85,18 +83,21 @@ final class SavedUsersView: NiblessView {
         separator.backgroundColor = .appGray
         return separator
     }()
-    
-    // MARK: - Initializers
+    //
+    // MARK: - Functions
+    //
     init(frame: CGRect = .zero,
          viewModel: RandomUsersViewModel) {
         
         self.viewModel = viewModel
         super.init(frame: frame)
-        backgroundColor = .appUltraLightGray
-        setupSearchBar()
-        setupSeparatorLine()
-        setupCollectionView()
         
+        subscribingToSavedUsers()
+        subscribingToRemovedUsers()
+        searchBarBinding()
+    }
+    
+    private func subscribingToSavedUsers() {
         viewModel.savedUsers
             .asDriver(onErrorRecover: { _ in fatalError("Encountered unexpected view model search results observable error.") })
             .drive(onNext: { [weak self] users in
@@ -122,53 +123,47 @@ final class SavedUsersView: NiblessView {
                 strongSelf.collectionView.reloadData()
             })
             .disposed(by: disposeBag)
-        
-        
-                viewModel.removedUsers
-                    .asDriver(onErrorRecover: { _ in fatalError("Encountered unexpected view model search results observable error.") })
-                    .drive(onNext: { [weak self] user in
-                        guard let strongSelf = self else {return}
-                        //Accepting new values
-                        strongSelf.removedUsersRelay.accept(user)
-                    })
-                    .disposed(by: disposeBag)
-        
-                removedUsers
-                    .asDriver(onErrorRecover: { _ in fatalError("Encountered unexpected search results observable error.") })
-                    .drive(onNext: { [weak self] user in
-                        guard let strongSelf = self else {return}
-        
-                        let fetchedUsers: NSFetchRequest<Person> = Person.fetchRequest()
-                        
-                        do {
-                            let removedUsers = try PersistanceService.context.fetch(fetchedUsers)
-                            strongSelf.allUsers = removedUsers
-                            strongSelf.shownUsers = strongSelf.allUsers
-                        } catch {
-                            fatalError("Error fetching data from Person class")
-                        }
-                        strongSelf.collectionView.reloadData()
-                    })
-                    .disposed(by: disposeBag)
     }
     
-    
-    // MARK: - Layouts
-    override func layoutSubviews() {
-        super.layoutSubviews()
+    private func subscribingToRemovedUsers() {
+        viewModel.removedUsers
+            .asDriver(onErrorRecover: { _ in fatalError("Encountered unexpected view model search results observable error.") })
+            .drive(onNext: { [weak self] user in
+                guard let strongSelf = self else {return}
+                //Accepting new values
+                strongSelf.removedUsersRelay.accept(user)
+            })
+            .disposed(by: disposeBag)
+        
+        removedUsers
+            .asDriver(onErrorRecover: { _ in fatalError("Encountered unexpected search results observable error.") })
+            .drive(onNext: { [weak self] user in
+                guard let strongSelf = self else {return}
+                
+                let fetchedUsers: NSFetchRequest<Person> = Person.fetchRequest()
+                
+                do {
+                    let removedUsers = try PersistanceService.context.fetch(fetchedUsers)
+                    strongSelf.allUsers = removedUsers
+                    strongSelf.shownUsers = strongSelf.allUsers
+                } catch {
+                    fatalError("Error fetching data from Person class")
+                }
+                strongSelf.collectionView.reloadData()
+            })
+            .disposed(by: disposeBag)
     }
     
-    private func setupSearchBar() {
-        addSubview(searchBar)
-        searchBar.anchor(top: safeAreaLayoutGuide.topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor,padding: .init(top: 0, left: 4, bottom: 0, right: 4))
+    private func searchBarBinding() {
         
         searchBar
             .rx.text
             .orEmpty
             .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
             .distinctUntilChanged()
-            .subscribe(onNext: { [unowned self] query in 
+            .subscribe(onNext: { [unowned self] query in
                 
+                //Rewrite this part
                 if query.count < 2 {
                     self.shownUsers = self.allUsers
                     self.isSearching = false
@@ -188,23 +183,42 @@ final class SavedUsersView: NiblessView {
                             $0.street!.lowercased().contains(query.lowercased())
                     }
                 }
-                
                 self.collectionView.reloadData()
             })
             .disposed(by: disposeBag)
-        
-             
-        
     }
     
-    private func setupSeparatorLine() {
+    //
+    // MARK: - Layout
+    //
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        backgroundColor = .appUltraLightGray
+        constructHierarchy()
+        activateConstraints()
+    }
+    
+    private func constructHierarchy() {
+        addSubview(searchBar)
         addSubview(separatorLine)
-        separatorLine.anchor(top: searchBar.bottomAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor)
-        
+        addSubview(collectionView)
     }
     
-    private func setupCollectionView() {
-        addSubview(collectionView)
+    private func activateConstraints() {
+        activateConstraintsSearchBar()
+        activateConstraintsSeparatorLine()
+        activateConstraintsCollectionView()
+    }
+    
+    private func activateConstraintsSearchBar() {
+        searchBar.anchor(top: safeAreaLayoutGuide.topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor,padding: .init(top: 0, left: 4, bottom: 0, right: 4))
+    }
+    
+    private func activateConstraintsSeparatorLine() {
+        separatorLine.anchor(top: searchBar.bottomAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor)
+    }
+    
+    private func activateConstraintsCollectionView() {
         collectionView.anchor(top: separatorLine.bottomAnchor, leading: leadingAnchor, bottom: bottomAnchor, trailing: trailingAnchor,padding: .init(top: 8, left: 0, bottom: 0, right: 0))
     }
     
@@ -216,28 +230,20 @@ extension SavedUsersView: UICollectionViewDataSource {
         return shownUsers.count
     }
     
-    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        
         let cell = collectionView .dequeueReusableCell(
             withReuseIdentifier: cellID,
             for: indexPath) as? SavedUserCell
-        
         cell?.randomUser = shownUsers[indexPath.item]
-        
         return cell!
-        
     }
-    
 }
 
 extension SavedUsersView: UICollectionViewDelegateFlowLayout {
     //sizeForItemAt
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-       
         
         return .init(width: UIScreen.main.bounds.width, height: 110)
-        
     }
 }
 
@@ -245,21 +251,22 @@ extension SavedUsersView: UICollectionViewDelegateFlowLayout {
 extension SavedUsersView: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
-        let id = shownUsers[indexPath.item].id!
-        let gender = shownUsers[indexPath.item].gender!
-        let firstname = shownUsers[indexPath.item].firstname!
-        let lastname = shownUsers[indexPath.item].lastname!
-        let city = shownUsers[indexPath.item].city!
-        let country = shownUsers[indexPath.item].country!
         let streetnumber = shownUsers[indexPath.item].streetnumber
-        let street = shownUsers[indexPath.item].street!
-        let latitude = shownUsers[indexPath.item].latitude!
-        let longitude = shownUsers[indexPath.item].longitude!
-        let phone = shownUsers[indexPath.item].phone!
-        let picture = shownUsers[indexPath.item].picture!
-       
         
-        let savedUserInfo = RandomUserInfo(gender: gender, name: .init(title: "", first: firstname, last: lastname), location: .init(street: .init(number: Int(streetnumber), name: street), city: city, state: "", country: country, postcode: Postcode.integer(0), coordinates: .init(latitude: latitude, longitude: longitude), timezone: .init(offset: "", timezoneDescription: "")), email: "", login: .init(uuid: id, username: "", password: "", salt: "", md5: "", sha1: "", sha256: ""), dob: .init(date: "", age: 0), registered: .init(date: "", age: 0), phone: phone, cell: "", id: .init(name: "", value: ""), picture: .init(large: picture, medium: "", thumbnail: ""), nat: "")
-        viewModel.passUserInfo(info: savedUserInfo)
+        if let id = shownUsers[indexPath.item].id,
+           let gender = shownUsers[indexPath.item].gender,
+           let firstname = shownUsers[indexPath.item].firstname,
+           let lastname = shownUsers[indexPath.item].lastname,
+           let city = shownUsers[indexPath.item].city,
+           let country = shownUsers[indexPath.item].country,
+           let street = shownUsers[indexPath.item].street,
+           let latitude = shownUsers[indexPath.item].latitude,
+           let longitude = shownUsers[indexPath.item].longitude,
+           let phone = shownUsers[indexPath.item].phone,
+           let picture = shownUsers[indexPath.item].picture {
+            let savedUserInfo = RandomUserInfo(gender: gender, name: Name(first: firstname, last: lastname), location: UserLocation(street: Street(number: Int(streetnumber), name: street), city: city, country: country, coordinates: Coordinates(latitude: latitude, longitude: longitude)), login: Login(uuid: id), phone: phone, picture: Picture(large: picture))
+            
+            viewModel.passUserInfo(info: savedUserInfo)
+        }
     }
 }

@@ -33,18 +33,44 @@ public struct RandomUserInfo: Codable {
     let picture: Picture
     let nat: String
     
+
+    init(gender: String, name: Name, location: UserLocation, login: Login, phone: String, picture: Picture) {
+        self.gender = gender
+        self.name = name
+        self.location = location
+        self.email = ""
+        self.login = login
+        self.dob = Dob()
+        self.registered = Dob()
+        self.phone = phone
+        self.cell = ""
+        self.id = ID()
+        self.picture = picture
+        self.nat = ""
+    }
+    
 }
 
 // MARK: - Dob
 public struct Dob: Codable {
     let date: String
     let age: Int
+    
+    init() {
+        self.date = ""
+        self.age = 0
+    }
 }
 
 // MARK: - ID
 public struct ID: Codable {
     let name: String
     let value: String?
+    
+    init() {
+        self.name = ""
+        self.value = ""
+    }
 }
 
 // MARK: - Location
@@ -54,6 +80,17 @@ public struct UserLocation: Codable {
     let postcode: Postcode
     let coordinates: Coordinates
     let timezone: Timezone
+    
+    init(street: Street, city: String,
+         country: String, coordinates: Coordinates) {
+        self.street = street
+        self.city = city
+        self.state = ""
+        self.country = country
+        self.postcode = Postcode.integer(0)
+        self.coordinates = coordinates
+        self.timezone = Timezone()
+    }
 }
 
 // MARK: - Coordinates
@@ -93,6 +130,11 @@ public enum Postcode: Codable {
 public struct Street: Codable {
     let number: Int
     let name: String
+    
+    init(number: Int, name: String) {
+        self.number = number
+        self.name = name
+    }
 }
 
 // MARK: - Timezone
@@ -103,23 +145,46 @@ public struct Timezone: Codable {
         case offset
         case timezoneDescription = "description"
     }
+    init() {
+        self.offset = ""
+        self.timezoneDescription = ""
+    }
 }
 
 // MARK: - Login
 public struct Login: Codable {
     let uuid, username, password, salt: String
     let md5, sha1, sha256: String
+    init(uuid: String) {
+        self.uuid = uuid
+        self.username = ""
+        self.password = ""
+        self.salt = ""
+        self.md5 = ""
+        self.sha1 = ""
+        self.sha256 = ""
+    }
 }
 
 // MARK: - Name
 public struct Name: Codable, Equatable {
     let title: String
     let first, last: String
+    init(first: String, last: String) {
+        self.first = first
+        self.last = last
+        self.title = ""
+    }
 }
 
 
 // MARK: - Picture
 public struct Picture: Codable {
     let large, medium, thumbnail: String
+    init(large: String) {
+        self.large = large
+        self.medium = ""
+        self.thumbnail = ""
+    }
 }
 

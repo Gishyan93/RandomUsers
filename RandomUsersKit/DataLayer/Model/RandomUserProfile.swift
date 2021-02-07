@@ -18,16 +18,11 @@ public struct RandomUserProfile {
     
     init() {
         self.gender = ""
-        self.name = Name(title: "", first: "", last: "")
-        self.location = UserLocation(street: .init(number: 0, name: ""),
-                                     city: "", state: "",
-                                     country: "",
-                                     postcode: Postcode.integer(0),
-                                     coordinates: .init(latitude: "", longitude: ""),
-                                     timezone: .init(offset: "", timezoneDescription: ""))
+        self.name = Name(first: "", last: "")
+        self.location = UserLocation(street: .init(number: 0, name: ""), city: "", country: "", coordinates: Coordinates(latitude: "", longitude: ""))
         self.phone = ""
         self.cell = ""
-        self.picture = Picture(large: "", medium: "", thumbnail: "")
+        self.picture = Picture(large: "")
         self.id = ""
     }
     

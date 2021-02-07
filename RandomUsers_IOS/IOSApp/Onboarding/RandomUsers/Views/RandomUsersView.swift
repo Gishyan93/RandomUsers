@@ -18,8 +18,10 @@ final class RandomUsersView: NiblessView {
         return randomUsersRelay.asObservable()
     }
     var randomUsersRelay = BehaviorRelay(value: [RandomUserInfo]())
+    
     var shownUsers = [RandomUserInfo]()
     var allUsers = [RandomUserInfo]()
+    
     var isPaginating: Bool = true
     var isSearching: Bool = false
     
@@ -77,25 +79,26 @@ final class RandomUsersView: NiblessView {
         separator.backgroundColor = .appGray
         return separator
     }()
-    
-    // MARK: - Initializers
+    //
+    // MARK: - Functions
+    //
     init(frame: CGRect = .zero,
          viewModel: RandomUsersViewModel) {
         
         self.viewModel = viewModel
         super.init(frame: frame)
-        backgroundColor = .appUltraLightGray
-        setupSearchBar()
-        setupSeparatorLine()
-        setupCollectionView()
         
         viewModel.loadRandomUsers()
-        
+    
+        subscribingToRandomUsers()
+        searchBarBinding()
+    }
+    
+    private func subscribingToRandomUsers() {
         viewModel.randomUsers
             .asDriver(onErrorRecover: { _ in fatalError("Encountered unexpected view model search results observable error.") })
             .drive(onNext: { [weak self] users in
                 guard let strongSelf = self else {return}
-                //Accepting new values
                 strongSelf.randomUsersRelay.accept(users)
             })
             .disposed(by: disposeBag)
@@ -111,19 +114,9 @@ final class RandomUsersView: NiblessView {
                     strongSelf.isPaginating = true
             })
             .disposed(by: disposeBag)
-        
     }
     
-    
-    // MARK: - Layouts
-    override func layoutSubviews() {
-        super.layoutSubviews()
-    }
-    
-    private func setupSearchBar() {
-        addSubview(searchBar)
-        searchBar.anchor(top: safeAreaLayoutGuide.topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor,padding: .init(top: 0, left: 4, bottom: 0, right: 4))
-        
+    private func searchBarBinding() {
         
         searchBar
             .rx.text
@@ -132,6 +125,8 @@ final class RandomUsersView: NiblessView {
             .distinctUntilChanged()
             .subscribe(onNext: { [unowned self] query in
                 
+                
+                //Rewrite this part
                 if query.count < 2 {
                     self.shownUsers = self.allUsers
                     self.isSearching = false
@@ -157,47 +152,62 @@ final class RandomUsersView: NiblessView {
                 self.collectionView.reloadData()
             })
             .disposed(by: disposeBag)
-        
+    }
+    //
+    // MARK: - Layout
+    //
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        backgroundColor = .appUltraLightGray
+        constructHierarchy()
+        activateConstraints()
     }
     
-    private func setupSeparatorLine() {
+    private func constructHierarchy() {
+        addSubview(searchBar)
         addSubview(separatorLine)
-        separatorLine.anchor(top: searchBar.bottomAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor)
-        
+        addSubview(collectionView)
     }
     
-    private func setupCollectionView() {
-        addSubview(collectionView)
+    private func activateConstraints() {
+        activateConstraintsSearchBar()
+        activateConstraintsSeparatorLine()
+        activateConstraintsCollectionView()
+    }
+    
+    private func activateConstraintsSearchBar() {
+        searchBar.anchor(top: safeAreaLayoutGuide.topAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor,padding: .init(top: 0, left: 4, bottom: 0, right: 4))
+    }
+    
+    private func activateConstraintsSeparatorLine() {
+        separatorLine.anchor(top: searchBar.bottomAnchor, leading: leadingAnchor, bottom: nil, trailing: trailingAnchor)
+    }
+    
+    private func activateConstraintsCollectionView() {
         collectionView.anchor(top: separatorLine.bottomAnchor, leading: leadingAnchor, bottom: bottomAnchor, trailing: trailingAnchor, padding: .init(top: 8, left: 0, bottom: 0, right: 0))
     }
-    
 }
-
-// MARK: - UICollectionViewDataSource
+//
+// MARK: - DataSource
+//
 extension RandomUsersView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return shownUsers.count
     }
     
-    
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        
         let cell = collectionView .dequeueReusableCell(
             withReuseIdentifier: cellID,
             for: indexPath) as? RandomUserCell
         
         cell?.randomUser = shownUsers[indexPath.item]
-        
         return cell!
-        
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let footer = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: footerID, for: indexPath)
         return footer
     }
-    
-    
 }
 
 extension RandomUsersView: UICollectionViewDelegateFlowLayout {
@@ -208,21 +218,19 @@ extension RandomUsersView: UICollectionViewDelegateFlowLayout {
         
     }
     
-    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
         let height: CGFloat = isSearching ? 0 : 130
         return .init(width: bounds.width, height: height)
     }
-    
 }
-
-// MARK: - UICollectionViewDelegate
+//
+// MARK: - Delegate
+//
 extension RandomUsersView: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         viewModel.passUserInfo(info: self.shownUsers[indexPath.item])
     }
 }
-
 
 extension RandomUsersView: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {

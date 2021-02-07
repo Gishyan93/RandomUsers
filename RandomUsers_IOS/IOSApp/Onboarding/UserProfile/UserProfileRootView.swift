@@ -23,14 +23,13 @@ class UserProfileRootView: NiblessView {
     
     var currentUser = RandomUserProfile()
     
-    var isSaved: Bool = false
     //Layout
     var stackView = UIStackView()
     
     private lazy var mapView: MKMapView = {
         let mv = MKMapView()
         mv.isUserInteractionEnabled = false
-
+        
         let zoomRange = MKMapView.CameraZoomRange(maxCenterCoordinateDistance: 2000)
         mv.setCameraZoomRange(zoomRange, animated: true)
         mv.delegate = self
@@ -49,7 +48,7 @@ class UserProfileRootView: NiblessView {
         return imageview
     }()
     
-private var saveUserButton: UIButton = {
+    private var saveUserButton: UIButton = {
         let button = UIButton(type: .system)
         button.backgroundColor = .appGreen
         button.layer.cornerRadius = 25
@@ -149,12 +148,12 @@ private var saveUserButton: UIButton = {
                 let location = CLLocationCoordinate2D(latitude: latitude!, longitude: longitude!)
                 let loc = CLLocation(latitude: latitude!, longitude: longitude!)
                 london.coordinate = location
-    
+                
                 strongSelf.mapView.addAnnotation(london)
                 strongSelf.mapView.centerToLocation(loc)
                 
                 strongSelf.currentUser = user
-                      
+                
                 let fetchedUsers: NSFetchRequest<Person> = Person.fetchRequest()
                 do {
                     let savedUsers = try PersistanceService.context.fetch(fetchedUsers)
@@ -314,31 +313,28 @@ extension UserProfileRootView {
     }
 }
 
-
-
-
 private extension MKMapView {
-  func centerToLocation(_ location: CLLocation, regionRadius: CLLocationDistance = 10000) {
-    let coordinateRegion = MKCoordinateRegion(
-      center: location.coordinate,
-      latitudinalMeters: regionRadius,
-      longitudinalMeters: regionRadius)
-    setRegion(coordinateRegion, animated: true)
-  }
+    func centerToLocation(_ location: CLLocation, regionRadius: CLLocationDistance = 10000) {
+        let coordinateRegion = MKCoordinateRegion(
+            center: location.coordinate,
+            latitudinalMeters: regionRadius,
+            longitudinalMeters: regionRadius)
+        setRegion(coordinateRegion, animated: true)
+    }
 }
 
 extension UserProfileRootView: MKMapViewDelegate {
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         if annotation is MKPointAnnotation {
-
+            
             let identifier = "stopAnnotation"
             var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
             if pinView == nil {
-
+                
                 //Create a plain MKAnnotationView if using a custom image...
                 pinView = MKAnnotationView(annotation: annotation, reuseIdentifier: identifier)
-
+                
                 pinView!.canShowCallout = true
                 pinView!.image = #imageLiteral(resourceName: "marker25")
             }
@@ -347,7 +343,7 @@ extension UserProfileRootView: MKMapViewDelegate {
                 //Update the annotation reference if re-using a view...
                 pinView!.annotation = annotation
             }
-
+            
             return pinView
         }
         return nil
